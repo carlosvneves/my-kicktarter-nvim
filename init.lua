@@ -233,6 +233,13 @@ require('lazy').setup({
       },
   },
   {
+     "booperlv/nvim-gomove",
+     lazy = false,
+     config = function()
+       require('gomove').setup()
+     end,
+  },
+  {
     -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
     -- Enable `lukas-reineke/indent-blankline.nvim`
@@ -267,8 +274,6 @@ require('lazy').setup({
       end, { noremap = true, desc = "Toggle Codeium active" })
     end,
   },
-
-
   -- Fuzzy Finder (files, lsp, etc)
   {
     'nvim-telescope/telescope.nvim',
@@ -428,6 +433,9 @@ require('telescope').setup {
     },
   },
 }
+
+
+
 
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
