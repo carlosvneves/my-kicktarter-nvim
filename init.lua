@@ -193,13 +193,18 @@ require('lazy').setup({
       end,
     },
   },
-  { "ellisonleao/gruvbox.nvim", 
-    priority = 1000 , 
-    config = function()
-      vim.cmd.colorscheme 'gruvbox'
-    end, 
-    opts = ...},
-
+  -- { "ellisonleao/gruvbox.nvim", 
+  --   priority = 1000 , 
+  --   config = function()
+  --     vim.cmd.colorscheme 'gruvbox'
+  --   end, 
+  --   opts = ...},
+  --
+  {
+    "scottmckendry/cyberdream.nvim",
+    lazy = false,
+    priority = 1000,
+  },
   -- {
   --   -- Theme Catppuccin
   --   "catppuccin/nvim", 
@@ -217,7 +222,7 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'gruvbox',
+        theme = 'cyberdream',
         component_separators = '|',
         section_separators = '',
       },
@@ -298,6 +303,13 @@ require('lazy').setup({
           require("lsp-inlayhints").on_attach(client, bufnr)
       end,
       })
+    end,
+
+  },
+  {
+    'tribela/vim-transparent',
+    config = function()
+      vim.g.transparent_enabled = true
     end,
 
   },
@@ -680,6 +692,7 @@ local servers = {
   clangd = {},
   gopls = {},
   pyright = {},
+  gleam = {},
   rust_analyzer = {},
   tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs'} },
