@@ -45,7 +45,6 @@ vim.g.maplocalleader = ' '
 
 
 
-
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    https://github.com/folke/lazy.nvim
 --    `:help lazy.nvim.txt` for more info
@@ -193,6 +192,9 @@ require('lazy').setup({
       end,
     },
   },
+ { "rose-pine/neovim", 
+    name = "rose-pine" 
+  },
   -- { "ellisonleao/gruvbox.nvim", 
   --   priority = 1000 , 
   --   config = function()
@@ -200,11 +202,11 @@ require('lazy').setup({
   --   end, 
   --   opts = ...},
   --
-  {
-    "scottmckendry/cyberdream.nvim",
-    lazy = false,
-    priority = 1000,
-  },
+  -- {
+  --   "scottmckendry/cyberdream.nvim",
+  --   lazy = false,
+  --   priority = 1000,
+  -- },
   -- {
   --   -- Theme Catppuccin
   --   "catppuccin/nvim", 
@@ -222,7 +224,7 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = false,
-        theme = 'cyberdream',
+        theme = 'rose-pine',
         component_separators = '|',
         section_separators = '',
       },
@@ -692,7 +694,7 @@ local servers = {
   clangd = {},
   gopls = {},
   pyright = {},
-  gleam = {},
+  -- gleam = {},
   rust_analyzer = {},
   tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs'} },
@@ -784,6 +786,13 @@ cmp.setup {
     { name = 'path' },
   },
 }
+
+-- set colorscheme
+vim.cmd("colorscheme rose-pine")
+
+-- set lsp for gleam
+local lspconfig = require('lspconfig')
+lspconfig.gleam.setup({})
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
