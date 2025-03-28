@@ -192,9 +192,10 @@ require('lazy').setup({
       end,
     },
   },
- { "rose-pine/neovim", 
-    name = "rose-pine" 
-  },
+ --  { 'echasnovski/mini.nvim', version = '*' },
+ -- { "rose-pine/neovim", 
+ --    name = "rose-pine" 
+ --  },
   -- { "ellisonleao/gruvbox.nvim", 
   --   priority = 1000 , 
   --   config = function()
@@ -216,6 +217,11 @@ require('lazy').setup({
   --     vim.cmd.colorscheme 'catppuccin'
   --   end,
   -- },
+   -- Lazy
+  {
+    "olimorris/onedarkpro.nvim",
+    priority = 1000, -- Ensure it loads first
+  },
 
   {
     -- Set lualine as statusline
@@ -223,8 +229,8 @@ require('lazy').setup({
     -- See `:help lualine.txt`
     opts = {
       options = {
-        icons_enabled = false,
-        theme = 'rose-pine',
+        icons_enabled = true,
+        theme = 'onedark',
         component_separators = '|',
         section_separators = '',
       },
@@ -270,6 +276,31 @@ require('lazy').setup({
     'windwp/nvim-autopairs',
     opts = {} -- equivalent to setup function 
   },
+  -- github copilot
+  -- {
+  --   "zbirenbaum/copilot.lua",
+  --   cmd = "Copilot",
+  --   event = "InsertEnter",
+  --   config = function()
+  --     require("copilot").setup({
+  --
+  --       suggestion = {
+  --         enabled = true,
+  --         auto_trigger = false,
+  --         hide_during_completion = true,
+  --         debounce = 75,
+  --         keymap = {
+  --         accept = "<C-g>",
+  --         accept_word = false,
+  --         accept_line = false,
+  --         next = "<C-]>",
+  --         prev = "<C-[>",
+  --         dismiss = "<C-]>",
+  --         },
+  --       },
+  --     })
+  --   end,
+  -- },
   -- Codeium
   {
     "Exafunction/codeium.vim",
@@ -287,6 +318,17 @@ require('lazy').setup({
       end, { noremap = true, desc = "Toggle Codeium active" })
     end,
   },
+  -- Use your favorite package manager to install, for example in lazy.nvim
+  --  Optionally, you can also install nvim-telescope/telescope.nvim to use some search functionality.
+  -- {
+  --   {
+  --     "sourcegraph/sg.nvim",
+  --     dependencies = { "nvim-lua/plenary.nvim", --[[ "nvim-telescope/telescope.nvim ]] },
+  --
+  --     -- If you have a recent version of lazy.nvim, you don't need to add this!
+  --     build = "nvim -l build/init.lua",
+  --   },
+  -- },
   --- lsp hints
   {
     "lvimuser/lsp-inlayhints.nvim",
@@ -660,23 +702,50 @@ local on_attach = function(_, bufnr)
 end
 
 -- document existing key chains
-require('which-key').register {
-  ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-  ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
-  ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
-  ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-  ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-  ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-  ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-}
+-- require('which-key').register {
+--   ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
+--   ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
+--   ['<leader>g'] = { name = '[G]it', _ = 'which_key_ignore' },
+--   ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+--   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
+--   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
+--   ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
+--   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+-- }
+
+  require('which-key').add(
+  {
+    { "<leader>c", group = "[C]ode" },
+    { "<leader>c_", hidden = true },
+    { "<leader>d", group = "[D]ocument" },
+    { "<leader>d_", hidden = true },
+    { "<leader>g", group = "[G]it" },
+    { "<leader>g_", hidden = true },
+    { "<leader>h", group = "Git [H]unk" },
+    { "<leader>h_", hidden = true },
+    { "<leader>r", group = "[R]ename" },
+    { "<leader>r_", hidden = true },
+    { "<leader>s", group = "[S]earch" },
+    { "<leader>s_", hidden = true },
+    { "<leader>t", group = "[T]oggle" },
+    { "<leader>t_", hidden = true },
+    { "<leader>w", group = "[W]orkspace" },
+    { "<leader>w_", hidden = true },
+  })
+
+
 -- register which-key VISUAL mode
 -- required for visual <leader>hs (hunk stage) to work
-require('which-key').register({
-  ['<leader>'] = { name = 'VISUAL <leader>' },
-  ['<leader>h'] = { 'Git [H]unk' },
-}, { mode = 'v' })
+-- require('which-key').register({
+--   ['<leader>'] = { name = 'VISUAL <leader>' },
+--   ['<leader>h'] = { 'Git [H]unk' },
+-- }, { mode = 'v' })
 
+  require('which-key').add(
+  {
+    { "<leader>", group = "VISUAL <leader>", mode = "v" },
+    { "<leader>h", desc = "Git [H]unk", mode = "v" },
+  })
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
 require('mason').setup()
@@ -696,7 +765,7 @@ local servers = {
   pyright = {},
   -- gleam = {},
   rust_analyzer = {},
-  tsserver = {},
+  -- tsserver = {},
   html = { filetypes = { 'html', 'twig', 'hbs'} },
 
 
@@ -787,12 +856,83 @@ cmp.setup {
   },
 }
 
--- set colorscheme
-vim.cmd("colorscheme rose-pine")
+-- set treesitter to c3 
+vim.filetype.add({
+  extension = {
+    c3 = "c3",
+    c3i = "c3",
+    c3t = "c3",
+  },
+})
 
--- set lsp for gleam
-local lspconfig = require('lspconfig')
-lspconfig.gleam.setup({})
+-- set lsp for c3
+local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+parser_config.c3 = {
+  install_info = {
+    url = "https://github.com/c3lang/tree-sitter-c3",
+    files = {"src/parser.c", "src/scanner.c"},
+    branch = "main",
+  },
+}
+
+-- local lspconfig = require('lspconfig')
+--   local util = require('lspconfig/util')
+--   local configs = require('lspconfig.configs')
+--   if not configs.c3_lsp then
+-- 	  configs.c3_lsp = {
+-- 	  	default_config = {
+-- 	  		cmd = { "/Users/carlosneves/c3lang/c3-lsp" },
+-- 	  		filetypes = { "c3", "c3i" },
+-- 	  		root_dir = function(fname)
+-- 	      		return util.find_git_ancestor(fname)
+-- 	    	end,
+-- 	    	settings = {},
+-- 	    	name = "c3_lsp"
+-- 	  	}
+-- 	  }
+--   end
+-- lspconfig.c3_lsp.setup{}
+--
+-- -- set lsp for gleam
+-- lspconfig.gleam.setup({})
+
+-- config ruff_lsp to work with pyright 
+-- local on_attach = function(client, bufnr)
+--   if client.name == 'ruff' then
+--     -- Disable hover in favor of Pyright
+--     client.server_capabilities.hoverProvider = false
+--   end
+-- end
+--
+require('lspconfig').ruff.setup {
+  init_options = {
+    settings = {
+      logLevel = 'debug',
+    }
+  }
+}
+require('lspconfig').ruff.setup {
+  on_attach = on_attach,
+}
+require('lspconfig').pyright.setup {
+  settings = {
+    pyright = {
+      -- Using Ruff's import organizer
+      disableOrganizeImports = true,
+    },
+    python = {
+      analysis = {
+        -- Ignore all files for analysis to exclusively use Ruff for linting
+        ignore = { '*' },
+      },
+    },
+  },
+}
+
+-- colorscheme:
+vim.cmd("colorscheme onedark") --
+
+-- require("sg").setup()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
