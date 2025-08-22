@@ -90,9 +90,15 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+vim.o.expandtab = true
+vim.o.shiftwidth = 4
+vim.o.tabstop = 4
+
 -- disable netrw at the very start of your init.lua
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+-- vim.g.loaded_netrw = 1
+-- vim.g.loaded_netrwPlugin = 1
+-- oil keymap
+vim.keymap.set("n", "<leader>o", ":Oil<CR>")
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
@@ -251,7 +257,7 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({
 	-- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-	"NMAC427/guess-indent.nvim", -- Detect tabstop and shiftwidth automatically
+	--"NMAC427/guess-indent.nvim", -- Detect tabstop and shiftwidth automatically
 
 	-- NOTE: Plugins can also be added by using a table,
 	-- with the first argument being the link and the following
@@ -290,32 +296,49 @@ require("lazy").setup({
 	-- ##########################################################################
 	-- MY PLUGINS
 	-- ##########################################################################
-
-	{ -- NvimTree
-		"nvim-tree/nvim-tree.lua",
-		version = "*",
+	{
+		"stevearc/oil.nvim",
+		---@module 'oil'
+		---@type oil.SetupOpts
+		opts = {},
+		-- Optional dependencies
+		dependencies = { { "echasnovski/mini.icons", opts = {} } },
+		-- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
+		-- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
 		lazy = false,
-		dependencies = {
-			"nvim-tree/nvim-web-devicons",
-		},
-		config = function()
-			require("nvim-tree").setup({
-				sort = {
-					sorter = "case_sensitive",
-				},
-				view = {
-					width = 20,
-				},
-				renderer = {
-					group_empty = true,
-				},
-				filters = {
-					dotfiles = true,
-				},
-			})
-		end,
 	},
-
+	-- { -- NvimTree
+	-- 	"nvim-tree/nvim-tree.lua",
+	-- 	version = "*",
+	-- 	lazy = false,
+	-- 	dependencies = {
+	-- 		"nvim-tree/nvim-web-devicons",
+	-- 	},
+	-- 	config = function()
+	-- 		require("nvim-tree").setup({
+	-- 			sort = {
+	-- 				sorter = "case_sensitive",
+	-- 			},
+	-- 			view = {
+	-- 				width = 20,
+	-- 			},
+	-- 			renderer = {
+	-- 				group_empty = true,
+	-- 			},
+	-- 			filters = {
+	-- 				dotfiles = true,
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- },
+	{ -- Set neovim-repl
+		"pappasam/nvim-repl",
+		keys = {
+			{ "<Leader>c", "<Plug>(ReplSendCell)", mode = "n", desc = "Send Repl Cell" },
+			{ "<Leader>r", "<Plug>(ReplSendLine)", mode = "n", desc = "Send Repl Line" },
+			{ "<Leader>r", "<Plug>(ReplSendVisual)", mode = "x", desc = "Send Repl Visual Selection" },
+		},
+	},
 	{
 		-- Set harppoon
 		"ThePrimeagen/harpoon",
@@ -841,6 +864,7 @@ require("lazy").setup({
 			require("mason-lspconfig").setup({
 				ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
 				automatic_installation = false,
+				automatic_setup = false,
 				handlers = {
 					function(server_name)
 						local server = servers[server_name] or {}
