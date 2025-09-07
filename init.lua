@@ -83,7 +83,6 @@ I hope you enjoy your Neovim journey,
 
 P.S. You can delete this when you're done too. It's your config now! :)
 --]]
-
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -379,7 +378,140 @@ require("lazy").setup({
 		"windwp/nvim-autopairs",
 		opts = {}, -- equivalent to setup function
 	},
+	-- Quarto Nvim
+	{
+		"quarto-dev/quarto-nvim",
+		dev = false,
+		opts = {
+			lspFeatures = {
+				enabled = true,
+				chunks = "curly",
+			},
+			codeRunner = {
+				enabled = true,
+				default_method = "slime",
+			},
+		},
+		dependencies = {
+			-- for language features in code cells
+			-- configured in lua/plugins/lsp.lua
+			"jmbuhr/otter.nvim",
+		},
+	},
+	{ -- directly open ipynb files as quarto docuements
+		-- and convert back behind the scenes
+		"GCBallesteros/jupytext.nvim",
+		opts = {
+			custom_language_formatting = {
+				python = {
+					extension = "qmd",
+					style = "quarto",
+					force_ft = "quarto",
+				},
+				r = {
+					extension = "qmd",
+					style = "quarto",
+					force_ft = "quarto",
+				},
+			},
+		},
+	},
+	{
+		"lervag/vimtex",
+		lazy = false, -- we don't want to lazy load VimTeX
+		-- tag = "v2.15", -- uncomment to pin to a specific release
+		init = function()
+			-- VimTeX configuration goes here, e.g.
+			vim.g.vimtex_view_method = "zathura"
+		end,
+	},
+	{ -- preview equations
+		"jbyuki/nabla.nvim",
+		dependencies = {
+			"nvim-neo-tree/neo-tree.nvim",
+			"williamboman/mason.nvim",
+		},
+		lazy = true,
 
+		config = function()
+			require("nvim-treesitter.configs").setup({
+				ensure_installed = { "latex" },
+				auto_install = true,
+				sync_install = false,
+				ignore_install = { "" },
+			})
+		end,
+
+		keys = function()
+			return {
+				{
+					"<leader>p",
+					':lua require("nabla").popup()<cr>',
+					desc = "NablaPopUp",
+				},
+			}
+		end,
+		--   "jbyuki/nabla.nvim",
+		-- keys = {
+		-- 	{ "<leader>qm", ':lua require"nabla".toggle_virt()<cr>', desc = "toggle [m]ath equations" },
+		-- },
+	},
+	{ -- send code from python/r/qmd documets to a terminal or REPL
+		-- like ipython, R, bash
+		"jpalardy/vim-slime",
+		dev = false,
+		init = function()
+			vim.b["quarto_is_python_chunk"] = false
+			Quarto_is_in_python_chunk = function()
+				require("otter.tools.functions").is_otter_language_context("python")
+			end
+
+			vim.cmd([[
+      let g:slime_dispatch_ipython_pause = 100
+      function SlimeOverride_EscapeText_quarto(text)
+      call v:lua.Quarto_is_in_python_chunk()
+      if exists('g:slime_python_ipython') && len(split(a:text,"\n")) > 1 && b:quarto_is_python_chunk && !(exists('b:quarto_is_r_mode') && b:quarto_is_r_mode)
+      return ["%cpaste -q\n", g:slime_dispatch_ipython_pause, a:text, "--", "\n"]
+      else
+      if exists('b:quarto_is_r_mode') && b:quarto_is_r_mode && b:quarto_is_python_chunk
+      return [a:text, "\n"]
+      else
+      return [a:text]
+      end
+      end
+      endfunction
+      ]])
+
+			vim.g.slime_target = "neovim"
+			vim.g.slime_no_mappings = true
+			vim.g.slime_python_ipython = 1
+		end,
+		config = function()
+			vim.g.slime_input_pid = false
+			vim.g.slime_suggest_default = true
+			vim.g.slime_menu_config = false
+			vim.g.slime_neovim_ignore_unlisted = true
+
+			local function mark_terminal()
+				local job_id = vim.b.terminal_job_id
+				vim.print("job_id: " .. job_id)
+			end
+
+			local function set_terminal()
+				vim.fn.call("slime#config", {})
+			end
+			vim.keymap.set("n", "<leader>cm", mark_terminal, { desc = "[m]ark terminal" })
+			vim.keymap.set("n", "<leader>cs", set_terminal, { desc = "[s]et terminal" })
+		end,
+	},
+	--
+	--Rustaceanvim
+	--
+	-- {
+	-- 	"mrcjkb/rustaceanvim",
+	-- 	version = "^6", -- Recommended
+	-- 	lazy = false, -- This plugin is already lazy
+	-- },
 	-- Codeium
 	{
 		"Exafunction/codeium.vim",
@@ -1005,7 +1137,7 @@ require("lazy").setup({
 
 			snippets = { preset = "luasnip" },
 
-			-- Blink.cmp includes an optional, recommended rust fuzzy matcher,
+			-- Blink.cmp des an optional, recommended rust fuzzy matcher,
 			-- which automatically downloads a prebuilt binary when enabled.
 			--
 			-- By default, we use the Lua implementation instead, but you may enable
@@ -1018,29 +1150,34 @@ require("lazy").setup({
 			signature = { enabled = true },
 		},
 	},
-
 	{ -- You can easily change to a different colorscheme.
 		-- Change the name of the colorscheme plugin below, and then
 		-- change the command in the config to whatever the name of that colorscheme is.
 		--
 		-- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-		"folke/tokyonight.nvim",
+		"olimorris/onedarkpro.nvim",
 		priority = 1000, -- Make sure to load this before all the other start plugins.
 		config = function()
 			---@diagnostic disable-next-line: missing-fields
-			require("tokyonight").setup({
-				styles = {
-					comments = { italic = true }, -- Disable italics in comments
+			require("onedarkpro").setup({
+				-- styles = {
+				-- 	comments = { italic = true }, -- Disable italics in comments
+				-- },
+				highlights = {
+					Comment = { italic = true },
+					Directory = { bold = true },
+					ErrorMsg = { italic = true, bold = true },
 				},
 			})
 
 			-- Load the colorscheme here.
 			-- Like many other themes, this one has different styles, and you could load
 			-- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-			vim.cmd.colorscheme("tokyonight-storm")
+			vim.cmd.colorscheme("onedark")
 		end,
 	},
-
+	-- Lazy
+	-- somewhere in your config:
 	-- Highlight todo, notes, etc in comments
 	{
 		"folke/todo-comments.nvim",
@@ -1124,7 +1261,7 @@ require("lazy").setup({
 		-- There are additional nvim-treesitter modules that you can use to interact
 		-- with nvim-treesitter. You should go explore a few and see what interests you:
 		--
-		--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
+		--    - Incremental selection: ded, see `:help nvim-treesitter-incremental-selection-mod`
 		--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
 		--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
 	},
@@ -1135,13 +1272,13 @@ require("lazy").setup({
 
 	-- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
 	--
-	--  Here are some example plugins that I've included in the Kickstart repository.
+	--  Here are some example plugins that I've ded in the Kickstart repository.
 	--  Uncomment any of the lines below to enable them (you will need to restart nvim).
 	--
 	-- require 'kickstart.plugins.debug',
-	-- require 'kickstart.plugins.indent_line',
+	-- require("kickstart.plugins.indent_line"),
 	-- require 'kickstart.plugins.lint',
-	-- require 'kickstart.plugins.autopairs',
+	-- require("kickstart.plugins.autopairs"),
 	-- require 'kickstart.plugins.neo-tree',
 	-- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
